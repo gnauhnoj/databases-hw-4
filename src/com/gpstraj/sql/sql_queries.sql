@@ -7,4 +7,4 @@ create view random as
 	order by rand()
      limit 10;
 
-select random.trun number_days_since_orig, count(random.trun) gps_pt_Count from gps join random on truncate(gps.dateNum, 0) = random.trun group by random.trun
+select random.trun number_days_since_orig, count(random.trun) gps_pt_Count from gps join random on truncate(gps.dateNum, 0) = random.trun group by random.trun;
