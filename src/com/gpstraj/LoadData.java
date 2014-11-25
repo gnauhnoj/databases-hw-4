@@ -17,29 +17,41 @@ import com.mongodb.*;
 public class LoadData {
 
     public static void main(String[] args) {
+        // TODO: modify to use path variable
         String path = args[0];
-//        String type = args[1];
 
         path = "/Users/jhh11/Downloads/Geolife Trajectories 1.3/";
         File file = new File(path + "/Data");
         // Reading directory contents
         String[] files = file.list();
+
+        // number of files to use
         int folders = 2;
 
-        // sql stuff
+        // INITIALIZE SQL
         Connection con = null;
         Statement stmt = null;
         String db = "GPSTraj";
 
+        // TODO: Initialize Mongo
+        MongoClient mongoClient = null;
+        DB mongodb = null;
 
-        MongoClient mongoClient = new MongoClient( "localhost" );
-        DB mongodb = mongoClient.getDB( "CS5320" );
+        // TODO: Initialize Redis
 
         try {
+            // Start SQL connection
             con = JDBCutils.getConnection();
             stmt = con.createStatement();
             stmt.executeUpdate("USE " + db);
 
+            // TODO: Start Mongo Connection
+            mongoClient = new MongoClient( "localhost" );
+            mongodb = mongoClient.getDB( db );
+            DBCollection TColl = mongodb.getCollection("Traj");
+
+
+            // TODO: Start Redis Connection
 
             for (int i = 0; i < folders; i++) {
                 String setName = files[i];
@@ -50,9 +62,12 @@ public class LoadData {
                     String trajN = trajName.substring(0, trajName.indexOf("."));
                     BufferedReader reader = null;
 
-                    // sql stuff
+                    // Insert SQL trajectories
                     int trajID = InsertSQL.insertTraj(con, setName, trajN);
-                    //
+
+                    // TODO: Insert Mongo Trajectories
+
+                    // TODO: Insert Redis Trajectories
 
                     try {
                         reader = new BufferedReader(new FileReader(path + "/Data/"
@@ -64,10 +79,12 @@ public class LoadData {
                             if(line == null) break;
                             if (count > 5) {
 
-                                // sql stuff
+                                // Insert SQL GPS points
                                 InsertSQL.insertGPS(con, trajID, line);
-                                //
 
+                                // TODO: Insert Mongo GPS
+
+                                // TODO: Insert Redis GPS
                             }
                             count++;
                         }
