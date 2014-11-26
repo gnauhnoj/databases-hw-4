@@ -1,8 +1,11 @@
-package com.gpstraj.sql;
+package com.gpstraj;
 
 /**
  * Created by jhh11 on 11/23/14.
  */
+
+import com.gpstraj.sql.JDBCutils;
+import redis.clients.jedis.Jedis;
 
 import java.sql.*;
 
@@ -36,9 +39,11 @@ public class CreateDB {
         String table2 = "GPS";
         String schemaQuery2 = "CREATE TABLE " + table2 +
                 " (`id` int NOT NULL AUTO_INCREMENT, " +
-                "`traj` int NOT NULL, `lat` float NOT NULL, `long` float NOT NULL, `zero` int NOT NULL, " +
-                "`altitude` int NOT NULL, `dateNum` float NOT NULL, `date` date NOT NULL, `time` time NOT NULL, " +
+                "`traj` int NOT NULL, `lat` double NOT NULL, `long` double NOT NULL, `zero` int NOT NULL, " +
+                "`altitude` int NOT NULL, `dateNum` double NOT NULL, `date` date NOT NULL, `time` time NOT NULL, " +
                 "primary key (`id`), foreign key (`traj`) references Traj(`id`))";
+
+        Jedis jedis = null;
 
         try {
             con = JDBCutils.getConnection();
@@ -48,12 +53,18 @@ public class CreateDB {
             stmt.executeUpdate("USE " + db);
             stmt = createTable(stmt, table1, schemaQuery1);
             stmt = createTable(stmt, table2, schemaQuery2);
+
+            // drop current jedis database
+            jedis = new Jedis("localhost", 6379);
+            jedis.flushDB();
         }
         catch (SQLException e) {e.printStackTrace();}
         catch (Exception e) {e.printStackTrace();}
         finally {
             JDBCutils.closeConnection(rs, stmt, con);
+            jedis.quit();
         }
+
 
         System.out.println("DONE");
     }
