@@ -57,8 +57,8 @@ public class CreateDB {
             stmt = createTable(stmt, table2, schemaQuery2);
 
             // drop current jedis database
-//            jedis = new Jedis("localhost", 6379);
-//            jedis.flushDB();
+            jedis = new Jedis("localhost", 6379);
+            jedis.flushDB();
 
             // Drop current mongo database
             mongoClient = new MongoClient("localhost",27017);
@@ -68,7 +68,7 @@ public class CreateDB {
         catch (Exception e) {e.printStackTrace();}
         finally {
             JDBCutils.closeConnection(rs, stmt, con);
-//            jedis.quit();
+            jedis.quit();
             mongoClient.close();
         }
 

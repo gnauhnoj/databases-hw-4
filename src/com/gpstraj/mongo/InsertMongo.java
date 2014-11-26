@@ -18,5 +18,4 @@ public class InsertMongo {
         DBCollection coll = db.getCollection("Traj");
         coll.insert(entry);
     }
-
 }
