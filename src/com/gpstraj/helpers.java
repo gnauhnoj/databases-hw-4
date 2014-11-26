@@ -14,6 +14,7 @@ import java.util.ArrayList;
  * Created by jhh11 on 11/25/14.
  */
 public class helpers {
+    // returns an array list of the randomly selected dates to be queried (see sql_queries.sql)
     public static ArrayList<Integer> getDates() {
         Connection con = null;
         Statement stmt = null;
@@ -38,8 +39,8 @@ public class helpers {
         return list;
     }
 
+    // parses the retrieved line of data into GPS point
     public static BasicDBObject getGPSPoint (String gps){
-
         String[] gpsArr = gps.split(",");
         BasicDBObject GPSPoint = new BasicDBObject("lat",Double.parseDouble(gpsArr[0]))
                 .append("long",Double.parseDouble(gpsArr[1]))

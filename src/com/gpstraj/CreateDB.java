@@ -26,6 +26,8 @@ public class CreateDB {
         return stmt;
     }
 
+    // Drops existing SQL, Mongo, and Redis databases
+    // Creates the SQL Schema
     public static void main (String[] args) {
         Connection con = null;
         Statement stmt = null;
@@ -64,14 +66,12 @@ public class CreateDB {
             mongoClient = new MongoClient("localhost",27017);
             mongoClient.dropDatabase("db");
         }
-        catch (SQLException e) {e.printStackTrace();}
         catch (Exception e) {e.printStackTrace();}
         finally {
             JDBCutils.closeConnection(rs, stmt, con);
             jedis.quit();
             mongoClient.close();
         }
-
 
         System.out.println("DONE");
     }

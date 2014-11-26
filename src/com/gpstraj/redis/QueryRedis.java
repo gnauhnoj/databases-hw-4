@@ -35,7 +35,7 @@ public class QueryRedis {
                 Set<String> sose = jedis.zrangeByScore(s, date, date + 1);
                 count += sose.size();
             }
-            System.out.println(date + ", " + count);
+            System.out.println("Date: " + date + ", Count: " + count);
         }
         Date date2 = new Date();
         long elapsedTime = System.nanoTime() - start;

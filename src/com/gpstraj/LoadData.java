@@ -26,17 +26,18 @@ import redis.clients.jedis.*;
 
 public class LoadData {
 
+    // Used to load data from 3 Trajectory set folders into SQL, Mongo, and Redis DB
+    // Assumes that the Databases are empty and have had CreateDB already called
     public static void main(String[] args) {
-        // TODO: modify to use provided path variable
-//        String path = args[0];
-        String path = "/Users/jhh11/Downloads/Geolife Trajectories 1.3/";
+        String path = args[0];
+//        String path = "/Users/jhh11/Downloads/Geolife Trajectories 1.3/";
 //        String path = "/Users/Alap/Documents/Cornell Tech/Database Systems/Assignment4/data/Geolife Trajectories 1.3/";
         File file = new File(path + "/Data");
         // Reading directory contents
         String[] files = file.list();
 
         // number of files to use
-        int folders = 5;
+        int folders = 3;
 
         // INITIALIZE SQL
         Connection con = null;
@@ -100,15 +101,14 @@ public class LoadData {
                             count++;
                         }
 
-                        // run redis pipeline sync
-
                         //Insert entry in MongoDB
                         InsertMongo.insertEntry(mongoClient,setName,trajN,GPSList);
 
                     } catch(Exception e) {
                         e.printStackTrace();
                     } finally {
-//                        p.sync();
+                        // run redis pipeline sync
+                        p.sync();
                         if(reader != null) {
                             try {
                                 reader.close();
@@ -121,7 +121,6 @@ public class LoadData {
                     trajN = null;
                 }
                 setName = null;
-                inner = null;
                 inners = null;
                 System.gc();
             }
