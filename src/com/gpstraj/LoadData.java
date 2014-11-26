@@ -42,7 +42,6 @@ public class LoadData {
 //        MongoClient mongoClient = null;
 //        DB mongodb = null;
 
-        // TODO: Initialize Redis
         Jedis jedis = null;
 
         try {
@@ -92,16 +91,16 @@ public class LoadData {
 
                                 // TODO: Insert Mongo GPS
 
-                                // Insert Redis GPS
-                                p = InsertRedis.insert(p, jedis, trajN, line);
+                                // Insert Redis GPS points
+                                InsertRedis.insert(p, trajN, line);
                             }
                             count++;
                         }
                         // run redis pipeline sync
-                        p.sync();
                     } catch(Exception e) {
                         e.printStackTrace();
                     } finally {
+                        p.sync();
                         if(reader != null) {
                             try {
                                 reader.close();
@@ -123,6 +122,7 @@ public class LoadData {
         catch (Exception e) {e.printStackTrace();}
         finally {
             JDBCutils.closeConnection(null, stmt, con);
+            jedis.quit();
             System.out.println("DONE");
         }
     }

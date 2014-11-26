@@ -8,3 +8,7 @@ Required Drivers:
 Redis info:
 - flushdb - clears db
 - flushall - clears everything
+
+Direction to call redis commands:
+java com.gpstraj.redis.QueryRedis CountGPS <trajectory name>
+java com.gpstraj.redis.QueryRedis CountDates (assumes that sql query selecting 10 random dates has been ran)

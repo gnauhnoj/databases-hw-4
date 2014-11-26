@@ -37,11 +37,11 @@ public class InsertSQL {
                 "INSERT INTO "+ table + " (`traj`, `lat`, `long`, `zero`, `altitude`, `dateNum`, `date`, `time`) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         ps.setInt(1, trajID);
-        ps.setFloat(2, Float.parseFloat(gpsArr[0]));
-        ps.setFloat(3, Float.parseFloat(gpsArr[1]));
+        ps.setDouble(2, Double.parseDouble(gpsArr[0]));
+        ps.setDouble(3, Double.parseDouble(gpsArr[1]));
         ps.setInt(4, Integer.parseInt(gpsArr[2]));
         ps.setInt(5, Integer.parseInt(gpsArr[3]));
-        ps.setFloat(6, Float.parseFloat(gpsArr[4]));
+        ps.setDouble(6, Double.parseDouble(gpsArr[4]));
         ps.setDate(7, java.sql.Date.valueOf(gpsArr[5]));
         ps.setTime(8, java.sql.Time.valueOf(gpsArr[6]));
         ps.executeUpdate();
