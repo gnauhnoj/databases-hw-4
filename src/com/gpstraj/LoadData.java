@@ -38,8 +38,8 @@ public class LoadData {
         String db = "GPSTraj";
 
         // TODO: Initialize Mongo
-//        MongoClient mongoClient = null;
-//        DB mongodb = null;
+        MongoClient mongoClient = null;
+        DB mongodb = null;
 
         // TODO: Initialize Redis
 //        Jedis pool = JedisPool(new JedisPoolConfig(), "localhost", 6379);
@@ -52,10 +52,10 @@ public class LoadData {
             stmt.executeUpdate("USE " + db);
 
             // TODO: Start Mongo Connection
-//            mongoClient = new MongoClient( "localhost" );
-//            mongodb = mongoClient.getDB( db );
-//            DBCollection collT = mongodb.getCollection("Traj");
-//            DBCollection collG = mongodb.getCollection("GPS");
+            mongoClient = new MongoClient( "localhost" );
+            mongodb = mongoClient.getDB( db );
+            DBCollection collT = mongodb.getCollection("Traj");
+            DBCollection collG = mongodb.getCollection("GPS");
 
             // TODO: Start Redis Connection
 
