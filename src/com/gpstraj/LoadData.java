@@ -1,3 +1,7 @@
+package com.gpstraj;
+
+import com.gpstraj.helpers;
+import com.gpstraj.mongo.InsertMongo;
 import com.gpstraj.redis.InsertRedis;
 import com.gpstraj.sql.InsertSQL;
 import com.gpstraj.sql.JDBCutils;
@@ -9,8 +13,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import com.mongodb.*;
+import com.mongodb.MongoClient;
 import redis.clients.jedis.*;
 
 
@@ -24,13 +30,14 @@ public class LoadData {
         // TODO: modify to use provided path variable
 //        String path = args[0];
 
-        String path = "/Users/jhh11/Downloads/Geolife Trajectories 1.3/";
+        //String path = "/Users/jhh11/Downloads/Geolife Trajectories 1.3/";
+        String path = "/Users/Alap/Documents/Cornell Tech/Database Systems/Assignment4/data/Geolife Trajectories 1.3/";
         File file = new File(path + "/Data");
         // Reading directory contents
         String[] files = file.list();
 
         // number of files to use
-        int folders = 1;
+        int folders = 2;
 
         // INITIALIZE SQL
         Connection con = null;
@@ -49,14 +56,14 @@ public class LoadData {
             stmt = con.createStatement();
             stmt.executeUpdate("USE " + db);
 
-            // TODO: Start Mongo Connection
-            mongoClient = new MongoClient( "localhost" );
-            mongodb = mongoClient.getDB( db );
-            DBCollection collT = mongodb.getCollection("Traj");
-            DBCollection collG = mongodb.getCollection("GPS");
+            // Start Mongo Connection
+            mongoClient = new MongoClient( "localhost", 27017 );
+            mongodb = mongoClient.getDB("db");
+            DBCollection coll = mongodb.getCollection("Traj");
+            //DBCollection collG = mongodb.getCollection("GPS");
 
             // Start Redis Connection - assumes an empty db - need to run flushdb on redis terminal (see CreateDB)
-            jedis = new Jedis("localhost", 6379);
+//            jedis = new Jedis("localhost", 6379);
 
             for (int i = 0; i < folders; i++) {
                 String setName = files[i];
@@ -67,14 +74,13 @@ public class LoadData {
                     String trajName = inners[j].getName();
                     String trajN = trajName.substring(0, trajName.indexOf("."));
                     BufferedReader reader = null;
+                    ArrayList<BasicDBObject> GPSList = new ArrayList<BasicDBObject>();
 
                     // Insert SQL trajectories
-                    int trajID = InsertSQL.insertTraj(con, setName, trajN);
-
-                    // TODO: Insert Mongo Trajectories
+//                    int trajID = InsertSQL.insertTraj(con, setName, trajN);
 
                     // Declare redis pipeline of statements for a trajectory
-                    Pipeline p = jedis.pipelined();
+//                    Pipeline p = jedis.pipelined();
 
                     try {
                         reader = new BufferedReader(new FileReader(path + "/Data/"
@@ -86,20 +92,26 @@ public class LoadData {
                             if(line == null) break;
                             if (count > 5) {
                                 // Insert SQL GPS points
-                                InsertSQL.insertGPS(con, trajID, line);
+//                                InsertSQL.insertGPS(con, trajID, line);
 
-                                // TODO: Insert Mongo GPS
+                                // Add new GPS point to GPS list
+                                GPSList.add(helpers.getGPSPoint(line));
 
                                 // Insert Redis GPS points
-                                InsertRedis.insert(p, trajN, line);
+//                                InsertRedis.insert(p, trajN, line);
                             }
                             count++;
                         }
+
                         // run redis pipeline sync
+
+                        //Insert entry in MongoDB
+                        InsertMongo.insertEntry(mongoClient,setName,trajN,GPSList);
+
                     } catch(Exception e) {
                         e.printStackTrace();
                     } finally {
-                        p.sync();
+//                        p.sync();
                         if(reader != null) {
                             try {
                                 reader.close();
@@ -121,7 +133,8 @@ public class LoadData {
         catch (Exception e) {e.printStackTrace();}
         finally {
             JDBCutils.closeConnection(null, stmt, con);
-            jedis.quit();
+            //jedis.quit();
+            mongoClient.close();
             System.out.println("DONE");
         }
     }

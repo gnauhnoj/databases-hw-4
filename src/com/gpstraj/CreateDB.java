@@ -5,6 +5,7 @@ package com.gpstraj;
  */
 
 import com.gpstraj.sql.JDBCutils;
+import com.mongodb.MongoClient;
 import redis.clients.jedis.Jedis;
 
 import java.sql.*;
@@ -44,6 +45,7 @@ public class CreateDB {
                 "primary key (`id`), foreign key (`traj`) references Traj(`id`))";
 
         Jedis jedis = null;
+        MongoClient mongoClient = null;
 
         try {
             con = JDBCutils.getConnection();
@@ -55,14 +57,19 @@ public class CreateDB {
             stmt = createTable(stmt, table2, schemaQuery2);
 
             // drop current jedis database
-            jedis = new Jedis("localhost", 6379);
-            jedis.flushDB();
+//            jedis = new Jedis("localhost", 6379);
+//            jedis.flushDB();
+
+            // Drop current mongo database
+            mongoClient = new MongoClient("localhost",27017);
+            mongoClient.dropDatabase("db");
         }
         catch (SQLException e) {e.printStackTrace();}
         catch (Exception e) {e.printStackTrace();}
         finally {
             JDBCutils.closeConnection(rs, stmt, con);
-            jedis.quit();
+//            jedis.quit();
+            mongoClient.close();
         }
 
 
