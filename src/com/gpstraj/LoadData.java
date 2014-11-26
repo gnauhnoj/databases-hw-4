@@ -30,7 +30,7 @@ public class LoadData {
         String[] files = file.list();
 
         // number of files to use
-        int folders = 1;
+        int folders = 3;
 
         // INITIALIZE SQL
         Connection con = null;
