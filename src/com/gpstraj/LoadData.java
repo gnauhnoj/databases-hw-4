@@ -37,7 +37,9 @@ public class LoadData {
         String[] files = file.list();
 
         // number of files to use
-        int folders = 2;
+
+        int folders = 3;
+
 
         // INITIALIZE SQL
         Connection con = null;
