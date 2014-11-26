@@ -1,8 +1,11 @@
-package com.gpstraj.sql;
+package com.gpstraj;
 
 /**
  * Created by jhh11 on 11/23/14.
  */
+
+import com.gpstraj.sql.JDBCutils;
+import redis.clients.jedis.Jedis;
 
 import java.sql.*;
 
@@ -54,6 +57,10 @@ public class CreateDB {
         finally {
             JDBCutils.closeConnection(rs, stmt, con);
         }
+
+        // drop current jedis database
+        Jedis jedis = new Jedis("localhost", 6379);
+        jedis.flushDB();
 
         System.out.println("DONE");
     }
