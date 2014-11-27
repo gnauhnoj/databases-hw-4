@@ -1,4 +1,4 @@
-package com.gpstraj.neo4j;
+package com.neo4j;
 
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;

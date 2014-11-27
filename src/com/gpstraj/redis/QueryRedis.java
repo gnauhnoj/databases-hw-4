@@ -16,16 +16,14 @@ import static java.lang.System.err;
  */
 public class QueryRedis {
     public static void countGPS (Jedis jedis, String trajN) throws Exception {
-        Date date1 = new Date();
-        System.out.println("Start Milliseconds: " + date1.getTime());
+        long start = System.nanoTime();
         System.out.println(jedis.zcard(trajN));
-        Date date2 = new Date();
-        System.out.println("End Milliseconds: " + date2.getTime());
+        long elapsedTime = System.nanoTime() - start;
+        System.out.println("Elapsed time to get number of gps points in trajectory " + trajN + " is " + elapsedTime);
     }
 
     public static void filterDate (Jedis jedis) throws Exception {
-        Date date1 = new Date();
-        System.out.println("Start Milliseconds: " + date1.getTime());
+        long start = System.nanoTime();
         ArrayList<Integer> dates = helpers.getDates();
         // this is super inefficient...
         for (Integer date : dates) {
@@ -37,10 +35,11 @@ public class QueryRedis {
                 Set<String> sose = jedis.zrangeByScore(s, date, date + 1);
                 count += sose.size();
             }
-            System.out.println(date + ", " + count);
+            System.out.println("Date: " + date + ", Count: " + count);
         }
         Date date2 = new Date();
-        System.out.println("End Milliseconds: " + date2.getTime());
+        long elapsedTime = System.nanoTime() - start;
+        System.out.println("Time to get all gps points is " + elapsedTime);
     }
 
     public static void main (String[] args) {
