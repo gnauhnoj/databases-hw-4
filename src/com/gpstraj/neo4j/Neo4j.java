@@ -4,6 +4,7 @@ import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.graphdb.index.UniqueFactory;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
@@ -13,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,11 +22,11 @@ import java.util.Set;
  */
 public class Neo4j {
     // Name of file to be read in
-    //private static final String textFile = "p2p-Gnutella04.txt";
+    private static final String textFile = "/Users/Alap/Documents/Cornell Tech/Database Systems/Assignment4/p2p-Gnutella04.txt";
 
     // Need to change this to a directory within the project
     private static final String DB_PATH = "/Users/Alap/Documents/Cornell Tech/Database Systems/Assignment4/data/neo4j";
-    private static final String textFile = "/Users/Alap/Downloads/roadNet-CA.txt";
+    //private static final String textFile = "/Users/Alap/Downloads/roadNet-CA.txt";
 
     Set<Integer> Nodes;
     GraphDatabaseService graphDB;
@@ -76,8 +78,24 @@ public class Neo4j {
     }
 
     public void readInFile (String file){
+        long start = System.nanoTime();
         Nodes = new HashSet<Integer>();
         int currSize = 0;
+        UniqueFactory.UniqueNodeFactory factory;
+
+        try ( Transaction tx = graphDB.beginTx() )
+        {
+            factory = new UniqueFactory.UniqueNodeFactory( graphDB, "users" )
+            {
+                @Override
+                protected void initialize( Node created, Map<String, Object> properties )
+                {
+                    created.addLabel( DynamicLabel.label( "ID" ) );
+                    created.setProperty( "id", properties.get( "id" ) );
+                }
+            };
+            tx.success();
+        }
 
         try {
 
@@ -106,8 +124,15 @@ public class Neo4j {
                 numarray[0] = Integer.parseInt(array[0]);
                 numarray[1] = Integer.parseInt(array[1]);
 
+                try ( Transaction tx = graphDB.beginTx() )
+                {
+                    firstNode = factory.getOrCreate( "id", numarray[0] );
+                    secondNode = factory.getOrCreate( "id", numarray[1] );
+                    tx.success();
+                }
+
                 // Add first node to HashSet and check whether it is a new node (size of HashSet)
-                Nodes.add(numarray[0]);
+/*                Nodes.add(numarray[0]);
                 if (Nodes.size() > currSize){
                     try ( Transaction tx = graphDB.beginTx() ) {
                         firstNode = graphDB.createNode(label);
@@ -145,7 +170,7 @@ public class Neo4j {
                         tx.success();
                     }
                 }
-                try (Transaction tx = graphDB.beginTx()){
+*/                try (Transaction tx = graphDB.beginTx()){
                     firstNode.createRelationshipTo(secondNode, RelTypes.CONNECTS);
                     tx.success();
                 }
@@ -156,11 +181,13 @@ public class Neo4j {
         } catch (Exception e){
             e.printStackTrace();
         }
+        long elapsedTime = System.nanoTime() - start;
+        System.out.println("Time to read in file: " + elapsedTime);
     }
 
     public void getNeighbors () {
         long start = System.nanoTime();
-        int neighbors = 0;
+        //int neighbors = 0;
         Node node;
         //String nodeResult = "";
 
